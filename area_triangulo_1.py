@@ -1,7 +1,10 @@
 num1 = float(input("Escribe el primer número: "))
 num2 = float(input("Escribe el segundo número: "))
 resultado = (num1*num2)/2
-print(resultado)
+if resultado>100:
+    print("Área:"{resultado},el area es grande)
+else:
+    print("Área:"{resultado},el area es chica)
 
 import tkinter as tk
 
