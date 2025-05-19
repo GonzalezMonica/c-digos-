@@ -2,6 +2,9 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 
+datos_guardados = []
+contador_datos = 0
+
 def inicio():
     area_dinamica_limpia()
     tk.Label(area_dinamica, text="Aquí va un mensaje de bienvenida", font=("Arial", 14)).pack(pady=10)
@@ -9,41 +12,97 @@ def inicio():
 
 def datos():
     area_dinamica_limpia()
-   
-    tk.Label(area_dinamica, text="Nombre Del Alumno").pack()
-    campo_texto_uno = tk.Entry(area_dinamica)
-    campo_texto_uno.pack(pady=5)
+    global campo_nombre, grupo_elegido, combo_grado, resultado_label_datos, sexo_elegido
+
+    tk.Label(area_dinamica, text="Nombre del Alumno:").pack()
+    campo_nombre = tk.Entry(area_dinamica)
+    campo_nombre.pack(pady=5)
+    
+    tk.Label(area_dinamica, text="Sexo:").pack()
+    sexo_elegido = tk.StringVar(value="M")
+    tk.Radiobutton(area_dinamica, text="M", variable=sexo_elegido, value="M").pack()
+    tk.Radiobutton(area_dinamica, text="F", variable=sexo_elegido, value="F").pack()
+
 
     tk.Label(area_dinamica, text="Grupo:").pack()
-    opcion_elegida = tk.StringVar(value="A")
-    tk.Radiobutton(area_dinamica, text="A", variable=opcion_elegida, value="A").pack()
-    tk.Radiobutton(area_dinamica, text="B", variable=opcion_elegida, value="B").pack()
-
-    tk.Label(area_dinamica, text="¿Qué grado estas cursando?").pack()
-    combo = ttk.Combobox(area_dinamica, values=["Primero", "Segundo", "Tercero"])
-    combo.pack()
-    combo.current(0)
-
-    def accion_guardar():
-        valor = campo_texto_uno.get()
-        messagebox.showinfo("Revisión", f"Texto: {valor}\nSelección: {opcion_elegida.get()}\nLista: {combo.get()}")
-
-    tk.Button(area_dinamica, text="Mostrar datos", command=accion_guardar).pack(pady=10)
+    grupo_elegido = tk.StringVar(value="A")
+    tk.Radiobutton(area_dinamica, text="A", variable=grupo_elegido, value="A").pack()
+    tk.Radiobutton(area_dinamica, text="B", variable=grupo_elegido, value="B").pack()
     
+    tk.Label(area_dinamica, text="¿Qué grado estás cursando?").pack()
+    combo_grado = ttk.Combobox(area_dinamica, values=["Primero", "Segundo", "Tercero"])
+    combo_grado.pack()
+    combo_grado.current(0)
+
+    tk.Label(area_dinamica, text="Calificación:").pack()
+    global campo_calificacion
+    campo_calificacion = tk.Entry(area_dinamica)
+    campo_calificacion.pack(pady=5)
+
+    tk.Button(area_dinamica, text="Guardar Datos", command=guardar_datos).pack(pady=10)
+
+    resultado_label_datos = tk.Label(area_dinamica, text="", justify="left")
+    resultado_label_datos.pack()
+
+def guardar_datos():
+    global contador_datos
+
+    nombre = campo_nombre.get()
+    grupo = grupo_elegido.get()
+    grado = combo_grado.get()
+    calificacion = campo_calificacion.get()
+    sexo = sexo_elegido.get()
+
+    if nombre and grupo and grado and calificacion:
+        try:
+            calificacion_num = float(calificacion)
+        except ValueError:
+            resultado_label_datos.config(text="La calificación debe ser un número")
+            return
+
+        persona = {
+            "Nombre": nombre,
+            "Sexo":sexo,
+            "Grupo": grupo,
+            "Grado": grado,
+            "Calificación": calificacion_num
+        }
+        datos_guardados.append(persona)
+        contador_datos += 1
+
+        campo_nombre.delete(0, tk.END)
+        campo_calificacion.delete(0, tk.END)
+
+        if contador_datos == 3:
+            mostrar_datos()
+    else:
+        resultado_label_datos.config(text="Llena todos los campos")
+
+def mostrar_datos():
+    text = ""
+    for i, persona in enumerate(datos_guardados, start=1):
+        text += f"Alumno #{i}\n"
+        text += f"Nombre: {persona['Nombre']}\n"
+        text += f"Sexo: {persona['Sexo']}\n"
+        text += f"Grupo: {persona['Grupo']}\n"
+        text += f"Grado: {persona['Grado']}\n"
+        text += f"Calificación: {persona['Calificación']}\n\n"
+
+
 def colores():
     area_dinamica_limpia()
     tk.Label(area_dinamica, text="Colores", font=("Arial", 14)).pack(pady=10)
 
-    colores = ["lightblue", "lightgreen", "lightyellow", "lightgray","white"]
+    colores_disponibles = ["lightblue", "lightgreen", "lightyellow", "lightgray", "white"]
     tk.Label(area_dinamica, text="Cambiar fondo:").pack()
 
-    def cambiar_color(c):
-        ventana_principal.config(bg=c)
-        menu_lateral.config(bg=c)
-        area_dinamica.config(bg=c)
+    def cambiar_color(color):
+        ventana_principal.config(bg=color)
+        menu_lateral.config(bg=color)
+        area_dinamica.config(bg=color)
 
-    for c in colores:
-        tk.Button(area_dinamica, text=c, bg=c, width=20, command=lambda col=c: cambiar_color(col)).pack(pady=2)
+    for color in colores_disponibles:
+        tk.Button(area_dinamica, text=color, bg=color, width=20, command=lambda c=color: cambiar_color(c)).pack(pady=2)
 
 def preguntas():
     area_dinamica_limpia()
