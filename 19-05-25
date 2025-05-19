@@ -2,53 +2,92 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 
-def interfaz_uno():
+datos_guardados = []
+contador_datos = 0
+
+def inicio():
     area_dinamica_limpia()
     tk.Label(area_dinamica, text="Aquí va un mensaje de bienvenida", font=("Arial", 14)).pack(pady=10)
-    tk.Button(area_dinamica, text="Botón 1", command=lambda: messagebox.showinfo("Título", "Mensaje temporal")).pack()
+    tk.Button(area_dinamica, text="Mostrar Mensaje de Bienvenida", command=lambda: messagebox.showinfo("¡Hola!", "Bienvenido a este nuevo proyecto")).pack()
 
-def interfaz_dos():
+def datos():
     area_dinamica_limpia()
-    tk.Label(area_dinamica, text="Aquí coloca un letrero o label que identifique al alumno", font=("Arial", 14)).pack(pady=10)
+    global campo_nombre, grupo_elegido, combo_grado, resultado_label_datos
 
-    tk.Label(area_dinamica, text="Campo A:").pack()
-    campo_texto_uno = tk.Entry(area_dinamica)
-    campo_texto_uno.pack(pady=5)
+    tk.Label(area_dinamica, text="Nombre del Alumno:").pack()
+    campo_nombre = tk.Entry(area_dinamica)
+    campo_nombre.pack(pady=5)
 
-    tk.Label(area_dinamica, text="Selección A:").pack()
-    opcion_elegida = tk.StringVar(value="Opción 1")
-    tk.Radiobutton(area_dinamica, text="Opción 1", variable=opcion_elegida, value="Opción 1").pack()
-    tk.Radiobutton(area_dinamica, text="Opción 2", variable=opcion_elegida, value="Opción 2").pack()
 
-    tk.Label(area_dinamica, text="Lista desplegable:").pack()
-    combo = ttk.Combobox(area_dinamica, values=["Uno", "Dos", "Tres"])
-    combo.pack()
-    combo.current(0)
+    tk.Label(area_dinamica, text="Grupo:").pack()
+    grupo_elegido = tk.StringVar(value="A")
+    tk.Radiobutton(area_dinamica, text="A", variable=grupo_elegido, value="A").pack()
+    tk.Radiobutton(area_dinamica, text="B", variable=grupo_elegido, value="B").pack()
+    
+    tk.Label(area_dinamica, text="¿Qué grado estás cursando?").pack()
+    combo_grado = ttk.Combobox(area_dinamica, values=["Primero", "Segundo", "Tercero"])
+    combo_grado.pack()
+    combo_grado.current(0)
 
-    def accion_guardar():
-        valor = campo_texto_uno.get()
-        messagebox.showinfo("Revisión", f"Texto: {valor}\nSelección: {opcion_elegida.get()}\nLista: {combo.get()}")
 
-    tk.Button(area_dinamica, text="Botón 2", command=accion_guardar).pack(pady=10)
 
-def interfaz_tres():
+    tk.Button(area_dinamica, text="Guardar Datos", command=guardar_datos).pack(pady=10)
+
+    resultado_label_datos = tk.Label(area_dinamica, text="", justify="left")
+    resultado_label_datos.pack()
+
+def guardar_datos():
+    global contador_datos
+
+    nombre = campo_nombre.get()
+    grupo = grupo_elegido.get()
+    grado = combo_grado.get()
+
+    if nombre and grupo and grado:
+            
+        persona = {
+            "Nombre": nombre,
+            "Grupo": grupo,
+            "Grado": grado,
+        }
+        datos_guardados.append(persona)
+        contador_datos += 1
+
+        campo_nombre.delete(0, tk.END)
+        
+
+        if contador_datos == 3:
+            mostrar_datos()
+    else:
+        resultado_label_datos.config(text="Llena todos los campos")
+
+def mostrar_datos():
+    text = ""
+    for i, persona in enumerate(datos_guardados, start=1):
+        text += f"Alumno #{i}\n"
+        text += f"Nombre: {persona['Nombre']}\n"
+        text += f"Grupo: {persona['Grupo']}\n"
+        text += f"Grado: {persona['Grado']}\n"
+       
+
+def colores():
     area_dinamica_limpia()
-    tk.Label(area_dinamica, text="Configuraciones temporales", font=("Arial", 14)).pack(pady=10)
+    tk.Label(area_dinamica, text="Colores", font=("Arial", 14)).pack(pady=10)
 
-    colores = ["lightblue", "lightgreen", "lightyellow", "lightgray"]
+    colores_disponibles = ["lightblue", "lightgreen", "lightyellow", "lightgray", "white"]
     tk.Label(area_dinamica, text="Cambiar fondo:").pack()
 
-    def cambiar_color(c):
-        ventana_principal.config(bg=c)
-        menu_lateral.config(bg=c)
-        area_dinamica.config(bg=c)
+    def cambiar_color(color):
+        ventana_principal.config(bg=color)
+        menu_lateral.config(bg=color)
+        area_dinamica.config(bg=color)
 
-    for c in colores:
-        tk.Button(area_dinamica, text=c, bg=c, width=20, command=lambda col=c: cambiar_color(col)).pack(pady=2)
+    for color in colores_disponibles:
+        tk.Button(area_dinamica, text=color, bg=color, width=20, command=lambda c=color: cambiar_color(c)).pack(pady=2)
 
-def interfaz_cuatro():
+def preguntas():
     area_dinamica_limpia()
-    tk.Label(area_dinamica, text="Texto de ayuda que el alumno debe mejorar", font=("Arial", 14)).pack(pady=10)
+    tk.Label(area_dinamica, text="Responde el siguiente cuestionario en tu libreta", font=("Arial", 14)).pack(pady=10)
     contenido = (
         "Explica con tus palabras:\n\n"
         "- ¿Qué hace cada botón?\n"
@@ -64,7 +103,7 @@ def area_dinamica_limpia():
 
 ventana_principal = tk.Tk()
 ventana_principal.title("Interfaz para prácticas")
-ventana_principal.geometry("500x400")
+ventana_principal.geometry("700x400")
 ventana_principal.config(bg="lightblue")
 
 menu_lateral = tk.Frame(ventana_principal, bg="lightblue", width=120)
@@ -73,11 +112,11 @@ menu_lateral.pack(side="left", fill="y")
 area_dinamica = tk.Frame(ventana_principal, bg="white")
 area_dinamica.pack(side="right", expand=True, fill="both")
 
-tk.Button(menu_lateral, text="Pantalla 1", command=interfaz_uno, width=15).pack(pady=10)
-tk.Button(menu_lateral, text="Pantalla 2", command=interfaz_dos, width=15).pack(pady=10)
-tk.Button(menu_lateral, text="Pantalla 3", command=interfaz_tres, width=15).pack(pady=10)
-tk.Button(menu_lateral, text="Pantalla 4", command=interfaz_cuatro, width=15).pack(pady=10)
+tk.Button(menu_lateral, text="Inicio ", command=inicio, width=15).pack(pady=10)
+tk.Button(menu_lateral, text="Datos del alumno", command=datos, width=15).pack(pady=10)
+tk.Button(menu_lateral, text="Color de Fondo", command=colores, width=15).pack(pady=10)
+tk.Button(menu_lateral, text="Cuestionario", command=preguntas, width=15).pack(pady=10)
 tk.Button(menu_lateral, text="Salir", command=ventana_principal.destroy, width=15).pack(pady=30)
 
-interfaz_uno()
+inicio()
 ventana_principal.mainloop()
