@@ -1,0 +1,62 @@
+import tkinter as tk
+
+class CalificacionesApp:
+    def __init__(self, ventana):
+        self.ventana = ventana
+        self.ventana.title("Gestión de Calificaciones")
+        self.ventana.geometry("600x400")
+        self.ventana.config(bg="light yellow")
+
+        tk.Label(ventana, text="Nombre:").pack()
+        self.entrada_nombre = tk.Entry(ventana)
+        self.entrada_nombre.pack()
+
+        tk.Label(ventana, text="Calificación 1:", bg="light yellow").pack()
+        self.entrada_prim = tk.Entry(ventana)
+        self.entrada_prim.pack()
+
+        tk.Label(ventana, text="Calificación 2:").pack()
+        self.entrada_seg = tk.Entry(ventana)
+        self.entrada_seg.pack()
+
+        tk.Label(ventana, text="Calificación 3:").pack()
+        self.entrada_ter = tk.Entry(ventana)
+        self.entrada_ter.pack()
+
+        tk.Button(ventana, text="Agregar", command=self.agregar_calificacion).pack()
+
+        self.etiqueta_resultado = tk.Label(ventana, text="Calificaciones registradas:")
+        self.etiqueta_resultado.pack()
+
+        self.lista_calificaciones = []
+
+    def agregar_calificacion(self):
+        nombre = self.entrada_nombre.get()
+        try:
+            calificaciones = [
+                float(self.entrada_prim.get()),
+                float(self.entrada_seg.get()),
+                float(self.entrada_ter.get())
+            ]
+            promedio = sum(calificaciones) / len(calificaciones)
+            self.lista_calificaciones.append((nombre, sorted(calificaciones, reverse=True), promedio))
+            self.lista_calificaciones.sort(key=lambda x: x[2], reverse=True)
+            self.actualizar_lista()
+
+            self.entrada_nombre.delete(0, tk.END)
+            self.entrada_prim.delete(0, tk.END)
+            self.entrada_seg.delete(0, tk.END)
+            self.entrada_ter.delete(0, tk.END)
+
+        except ValueError:
+            self.etiqueta_resultado.config(text="Ingrese calificaciones válidas")
+
+    def actualizar_lista(self):
+        texto = "Calificaciones registradas:\n"
+        for nombre, calificaciones, promedio in self.lista_calificaciones:
+            texto += f"{nombre}: {calificaciones} | Promedio: {promedio:.2f}\n"
+        self.etiqueta_resultado.config(text=texto)
+
+ventana = tk.Tk()
+app = CalificacionesApp(ventana)
+ventana.mainloop()
